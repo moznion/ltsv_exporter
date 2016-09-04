@@ -51,6 +51,11 @@ How to build
 $ make VERSION=1.0.0
 ```
 
+Executable binaries
+--
+
+They are on [GitHub Releases](https://github.com/moznion/ltsv_exporter/releases).
+
 Author
 --
 
