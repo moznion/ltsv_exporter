@@ -1,7 +1,7 @@
 ltsv_exporter
 ==
 
-An [Prometheus](https://prometheus.io/) exporter that scrapes LTSV.
+A [Prometheus](https://prometheus.io/) exporter that scrapes LTSV.
 
 Example
 --
