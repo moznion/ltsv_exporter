@@ -1,7 +1,55 @@
 ltsv_exporter
 ==
 
-An Prometheus exporter that scrapes LTSV.
+An [Prometheus](https://prometheus.io/) exporter that scrapes LTSV.
+
+Example
+--
+
+### Supplied LTSV
+
+```
+size:123	duration:4.097	time:2016-09-04T22:22:14+09:00
+```
+
+### Exporter's output
+
+```
+# HELP ltsv_value LTSV value
+# TYPE ltsv_value gauge
+ltsv_value{key="duration"} 4.097
+ltsv_value{key="size"} 123
+```
+
+This exporter only collects numeric values. Other type values are ignored.
+
+Description
+--
+
+This exporter can scrape LSTV string and export contents of the LTSV as Prometheus format.
+
+Usage
+--
+
+```
+$ ltsv_exporter --url https://example.com/sample.ltsv
+```
+
+### Options
+
+```
+-h, --help          display help information
+-v, --version       display version and revision
+-p, --port[=6666]   set the port number to listen
+-u, --url          *set a URL of the LTSV
+```
+
+How to build
+--
+
+```
+$ make VERSION=1.0.0
+```
 
 Author
 --
