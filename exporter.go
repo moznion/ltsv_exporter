@@ -1,11 +1,12 @@
 package ltsvExporter
 
 import (
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"sync"
 
-	"github.com/najeira/ltsv"
+	"github.com/Songmu/go-ltsv"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 )
@@ -63,21 +64,24 @@ func (e *exporter) collect(ch chan<- prometheus.Metric) error {
 	}
 	defer ltsvResp.Body.Close()
 
-	ltsvReader := ltsv.NewReader(ltsvResp.Body)
-	ltsvRecords, err := ltsvReader.ReadAll()
+	body, err := ioutil.ReadAll(ltsvResp.Body)
 	if err != nil {
 		return err
 	}
 
-	for _, ltsvRecord := range ltsvRecords {
-		for k, v := range ltsvRecord {
-			f, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				log.Debug("Not a number, ignore [key=%s, value=%s]", k, v)
-				continue
-			}
-			e.value.WithLabelValues(k).Set(f)
+	ltsvRecords := make(map[string]string)
+	err = ltsv.Unmarshal(body, &ltsvRecords)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range ltsvRecords {
+		f, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			log.Debug("Not a number, ignore [key=%s, value=%s]", k, v)
+			continue
 		}
+		e.value.WithLabelValues(k).Set(f)
 	}
 
 	return nil
