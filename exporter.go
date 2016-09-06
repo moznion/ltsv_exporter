@@ -1,8 +1,6 @@
 package ltsvExporter
 
 import (
-	"io/ioutil"
-	"net/http"
 	"strconv"
 	"sync"
 
@@ -15,12 +13,12 @@ const namespace = "ltsv"
 
 type exporter struct {
 	mu             sync.Mutex
-	ltsvURL        string
+	ltsvScraper    ltsvScraper
 	value          prometheus.GaugeVec
 	scrapeFailures prometheus.Counter
 }
 
-func newExporter(ltsvURL string) *exporter {
+func newExporter(ltsvScraper ltsvScraper) *exporter {
 	e := &exporter{
 		value: *prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -32,7 +30,7 @@ func newExporter(ltsvURL string) *exporter {
 			Name:      "exporter_scrape_failures_total",
 			Help:      "Number of errors while scraping",
 		}),
-		ltsvURL: ltsvURL,
+		ltsvScraper: ltsvScraper,
 	}
 
 	return e
@@ -58,16 +56,7 @@ func (e *exporter) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (e *exporter) collect(ch chan<- prometheus.Metric) error {
-	ltsvResp, err := http.Get(e.ltsvURL)
-	if err != nil {
-		return err
-	}
-	defer ltsvResp.Body.Close()
-
-	body, err := ioutil.ReadAll(ltsvResp.Body)
-	if err != nil {
-		return err
-	}
+	body, err := e.ltsvScraper.scrape()
 
 	ltsvRecords := make(map[string]string)
 	err = ltsv.Unmarshal(body, &ltsvRecords)

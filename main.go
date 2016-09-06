@@ -30,14 +30,13 @@ func Run(args []string) {
 			return nil
 		}
 
-		port := argv.Port
-		ltsvURL := argv.LTSVURL
+		ltsvScraper := newRemoteLTSVScraper(argv.LTSVURL)
 
-		prometheus.MustRegister(newExporter(ltsvURL))
+		prometheus.MustRegister(newExporter(ltsvScraper))
 
 		http.Handle("/metrics", prometheus.Handler())
 
-		addr := fmt.Sprintf(":%d", port)
+		addr := fmt.Sprintf(":%d", argv.Port)
 		log.Print("Listening 127.0.0.1", addr)
 		log.Fatal(http.ListenAndServe(addr, nil))
 
