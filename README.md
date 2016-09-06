@@ -35,13 +35,20 @@ Usage
 $ ltsv_exporter --url https://example.com/sample.ltsv
 ```
 
+or
+
+```
+$ ltsv_exporter --file /path/to/sample.ltsv
+```
+
 ### Options
 
 ```
 -h, --help          display help information
 -v, --version       display version and revision
 -p, --port[=6666]   set the port number to listen
--u, --url          *set a URL of the LTSV
+-u, --url           set a URL of the LTSV
+-f, --file          set a file of the LTSV
 ```
 
 How to build
