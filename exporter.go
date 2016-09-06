@@ -19,7 +19,7 @@ type exporter struct {
 }
 
 func newExporter(ltsvScraper ltsvScraper) *exporter {
-	e := &exporter{
+	return &exporter{
 		value: *prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "value",
@@ -32,8 +32,6 @@ func newExporter(ltsvScraper ltsvScraper) *exporter {
 		}),
 		ltsvScraper: ltsvScraper,
 	}
-
-	return e
 }
 
 func (e *exporter) Describe(ch chan<- *prometheus.Desc) {

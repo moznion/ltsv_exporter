@@ -16,9 +16,10 @@ var (
 
 type opt struct {
 	cli.Helper
-	Version bool   `cli:"!v,version" usage:"display version and revision"`
-	Port    int    `cli:"p,port" usage:"set the port number to listen" dft:"6666"`
-	LTSVURL string `cli:"*u,url" usage:"set a URL of the LTSV"`
+	Version      bool   `cli:"v,version" usage:"display version and revision"`
+	Port         int    `cli:"p,port" usage:"set the port number to listen" dft:"6666"`
+	LTSVURL      string `cli:"u,url" usage:"set a URL of the LTSV"`
+	LTSVFilePath string `cli:"f,file" usage:"set a file of the LTSV"`
 }
 
 func Run(args []string) {
@@ -30,7 +31,17 @@ func Run(args []string) {
 			return nil
 		}
 
-		ltsvScraper := newRemoteLTSVScraper(argv.LTSVURL)
+		var ltsvScraper ltsvScraper
+		if argv.LTSVURL != "" {
+			ltsvScraper = newRemoteLTSVScraper(argv.LTSVURL)
+			log.Printf("Target LTSV => remote: %s", argv.LTSVURL)
+		} else if argv.LTSVFilePath != "" {
+			ltsvScraper = newFileLTSVScraper(argv.LTSVFilePath)
+			log.Printf("Target LTSV => file: %s", argv.LTSVFilePath)
+		} else {
+			ctx.String("[ERROR] required parameter --url or --file missing\n")
+			return nil
+		}
 
 		prometheus.MustRegister(newExporter(ltsvScraper))
 
